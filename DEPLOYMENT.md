@@ -1,51 +1,51 @@
 # 🚀 Deployment Guide - QR Designer
 
-## Najlepsze darmowe opcje hostingu
+## Best Free Hosting Options
 
-### 1. 🥇 **Vercel** (REKOMENDOWANE)
-**Dlaczego najlepsze:**
-- ✅ Darmowy plan: unlimited projekty
-- ✅ Automatyczny deployment z GitHub
-- ✅ Własna domena: `twoja-nazwa.vercel.app`
-- ✅ Bardzo szybkie CDN
-- ✅ Zero konfiguracji dla React/Vite
+### 1. 🥇 **Vercel** (RECOMMENDED)
+**Why it's the best:**
+- ✅ Free plan: unlimited projects
+- ✅ Automatic deployment from GitHub
+- ✅ Custom domain: `your-name.vercel.app`
+- ✅ Very fast CDN
+- ✅ Zero configuration for React/Vite
 
-**Instrukcja:**
-1. Idź na https://vercel.com
-2. Zaloguj się przez GitHub
-3. Kliknij "New Project"
-4. Wybierz repository `qr-designer`
-5. Vercel automatycznie wykryje Vite i skonfiguruje build
-6. Kliknij "Deploy"
+**Instructions:**
+1. Go to https://vercel.com
+2. Sign in with GitHub
+3. Click "New Project"
+4. Select `qr-designer` repository
+5. Vercel will automatically detect Vite and configure the build
+6. Click "Deploy"
 
-**Gotowe!** Aplikacja będzie dostępna pod `https://qr-designer-[random].vercel.app`
+**Done!** The application will be available at `https://qr-designer-[random].vercel.app`
 
 ---
 
 ### 2. 🥈 **Netlify**
-**Zalety:**
-- ✅ Darmowy plan: 100GB bandwidth/miesiąc
-- ✅ Drag & drop deployment lub GitHub integration
-- ✅ Własna domena: `twoja-nazwa.netlify.app`
-- ✅ Formularz kontaktowy (jeśli potrzebne)
+**Advantages:**
+- ✅ Free plan: 100GB bandwidth/month
+- ✅ Drag & drop deployment or GitHub integration
+- ✅ Custom domain: `your-name.netlify.app`
+- ✅ Contact form (if needed)
 
-**Instrukcja:**
-1. Zbuduj projekt: `npm run build`
-2. Idź na https://netlify.com
-3. Przeciągnij folder `dist` na stronę
-4. Lub połącz z GitHub dla auto-deployment
+**Instructions:**
+1. Build the project: `npm run build`
+2. Go to https://netlify.com
+3. Drag the `dist` folder onto the page
+4. Or connect with GitHub for auto-deployment
 
 ---
 
 ### 3. 🥉 **GitHub Pages**
-**Zalety:**
-- ✅ Całkowicie darmowe
-- ✅ Integracja z GitHub
-- ✅ Domena: `username.github.io/qr-designer`
+**Advantages:**
+- ✅ Completely free
+- ✅ GitHub integration
+- ✅ Domain: `username.github.io/qr-designer`
 
-**Instrukcja:**
-1. Zainstaluj gh-pages: `npm install --save-dev gh-pages`
-2. Dodaj do package.json:
+**Instructions:**
+1. Install gh-pages: `npm install --save-dev gh-pages`
+2. Add to package.json:
 ```json
 {
   "scripts": {
@@ -55,87 +55,87 @@
   "homepage": "https://username.github.io/qr-designer"
 }
 ```
-3. Uruchom: `npm run deploy`
+3. Run: `npm run deploy`
 
 ---
 
 ### 4. **Firebase Hosting**
-**Zalety:**
+**Advantages:**
 - ✅ Google infrastructure
-- ✅ Bardzo szybkie
-- ✅ Domena: `project-id.web.app`
+- ✅ Very fast
+- ✅ Domain: `project-id.web.app`
 
-**Instrukcja:**
-1. Zainstaluj Firebase CLI: `npm install -g firebase-tools`
+**Instructions:**
+1. Install Firebase CLI: `npm install -g firebase-tools`
 2. `firebase login`
 3. `firebase init hosting`
-4. Wybierz folder `dist`
+4. Select `dist` folder
 5. `npm run build && firebase deploy`
 
 ---
 
-## 🎯 REKOMENDACJA: Vercel
+## 🎯 RECOMMENDATION: Vercel
 
-**Dlaczego Vercel:**
-1. **Najłatwiejszy** - zero konfiguracji
-2. **Najszybszy** - deployment w 30 sekund
-3. **Automatyczny** - każdy push = nowy deployment
-4. **Profesjonalny** - używają go największe firmy
-5. **Analytics** - statystyki ruchu za darmo
+**Why Vercel:**
+1. **Easiest** - zero configuration
+2. **Fastest** - deployment in 30 seconds
+3. **Automatic** - every push = new deployment
+4. **Professional** - used by the biggest companies
+5. **Analytics** - traffic statistics for free
 
-## 📋 Kroki dla Vercel:
+## 📋 Steps for Vercel:
 
-### Krok 1: Przygotowanie
+### Step 1: Preparation
 ```bash
-# Upewnij się że projekt się buduje
+# Make sure the project builds
 npm run build
 
-# Sprawdź czy wszystko działa lokalnie
+# Check if everything works locally
 npm run preview
 ```
 
-### Krok 2: GitHub
-1. Stwórz repository na GitHub (jeśli jeszcze nie masz)
-2. Push kod:
+### Step 2: GitHub
+1. Create a repository on GitHub (if you don't have one yet)
+2. Push code:
 ```bash
 git add .
 git commit -m "Ready for deployment"
 git push origin main
 ```
 
-### Krok 3: Vercel
-1. Idź na https://vercel.com
-2. "Sign up" przez GitHub
+### Step 3: Vercel
+1. Go to https://vercel.com
+2. "Sign up" with GitHub
 3. "New Project"
-4. "Import" twoje repository
-5. Vercel automatycznie wykryje:
+4. "Import" your repository
+5. Vercel will automatically detect:
    - Framework: Vite
    - Build Command: `npm run build`
    - Output Directory: `dist`
-6. Kliknij "Deploy"
+6. Click "Deploy"
 
-### Krok 4: Gotowe! 🎉
-- Aplikacja będzie dostępna pod unikalnym URL
-- Każdy push na GitHub = automatyczny redeploy
-- Możesz dodać własną domenę w ustawieniach
+### Step 4: Done! 🎉
+- The application will be available at a unique URL
+- Every push to GitHub = automatic redeploy
+- You can add your own domain in settings
 
-## 🔧 Konfiguracja dla Vite
+## 🔧 Configuration for Vite
 
-Jeśli planujesz używać własnej domeny, dodaj do `vite.config.ts`:
+If you plan to use your own domain, add to `vite.config.ts`:
 
 ```typescript
 export default defineConfig({
   plugins: [react()],
-  base: '/', // dla własnej domeny
-  // base: '/qr-designer/', // dla GitHub Pages
+  base: '/', // for your own domain
+  // base: '/qr-designer/', // for GitHub Pages
 })
 ```
 
-## 🌐 Po deployment
+## 🌐 After deployment
 
-Twoja aplikacja będzie dostępna 24/7 pod adresem typu:
+Your application will be available 24/7 at addresses like:
 - Vercel: `https://qr-designer-abc123.vercel.app`
 - Netlify: `https://amazing-name-123456.netlify.app`
 - GitHub Pages: `https://username.github.io/qr-designer`
 
-**Wszystko działa offline** - użytkownicy mogą używać aplikacji bez internetu po pierwszym załadowaniu!
+**Everything works offline** - users can use the application without internet after the first load!

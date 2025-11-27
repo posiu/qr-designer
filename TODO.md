@@ -1,62 +1,62 @@
 # TODO – QR Designer
 
-Lista planowanych zadań w kolejności realizacji.
+List of planned tasks in order of implementation.
 
-## 🔥 Wysoki priorytet
+## 🔥 High Priority
 
-- [x] ~~Migracja do `qr-code-styling` w celu obsługi:~~
+- [x] ~~Migration to `qr-code-styling` for support of:~~
   - [x] ~~rounded dots~~
-  - [x] ~~stylowanych rogów~~
-  - [x] ~~gradientów~~
-- [x] ~~Komponent SettingsPanel (Refactor App.tsx)~~
-- [x] ~~Komponent GalleryPanel~~
-- [x] ~~Drag & drop logo (dowolna pozycja)~~
-- [x] ~~Zaawansowane presety (gradienty, neon, monochrome)~~
+  - [x] ~~styled corners~~
+  - [x] ~~gradients~~
+- [x] ~~SettingsPanel component (Refactor App.tsx)~~
+- [x] ~~GalleryPanel component~~
+- [x] ~~Drag & drop logo (any position)~~
+- [x] ~~Advanced presets (gradients, neon, monochrome)~~
 
-## 🧩 Średni priorytet
+## 🧩 Medium Priority
 
-- [x] ~~Eksport konfiguracji do pliku JSON~~
-- [x] ~~Import presetów z JSON~~
-- [x] ~~Automatyczne testy QR (czy kod działa i jest skanowalny)~~
-- [x] ~~Tryb ciemny UI~~
-- [x] ~~Optymalizacja generowania SVG~~
+- [x] ~~Export configuration to JSON file~~
+- [x] ~~Import presets from JSON~~
+- [x] ~~Automatic QR tests (check if code works and is scannable)~~
+- [x] ~~Dark mode UI~~
+- [x] ~~SVG generation optimization~~
 
-## 🎨 Niski priorytet
+## 🎨 Low Priority
 
-- [ ] Animowane QR (GIF/WebM)
-- [ ] Własne kształty modułów
-- [ ] Integracja z API shorten.link (shortener)
-- [ ] Tryb "brand kit": zapis wielu logo + kolorów
+- [ ] Animated QR (GIF/WebM)
+- [ ] Custom module shapes
+- [ ] Integration with shorten.link API (shortener)
+- [ ] "Brand kit" mode: save multiple logos + colors
 
-## ✅ Ukończone w tej sesji
+## ✅ Completed in this session
 
-### Opcja A - Refaktoryzacja architektury
-- [x] Refaktoryzacja App.tsx - wydzielenie komponentów
-- [x] Implementacja obsługi Wi-Fi QR codes
-- [x] Dodanie eksportu SVG
-- [x] Lokalna galeria z localStorage (50 elementów)
+### Option A - Architecture refactoring
+- [x] App.tsx refactoring - component extraction
+- [x] Wi-Fi QR codes implementation
+- [x] SVG export addition
+- [x] Local gallery with localStorage (50 items)
 - [x] Web Share API
-- [x] Obsługa różnych typów danych (URL, Text, Wi-Fi)
+- [x] Support for different data types (URL, Text, Wi-Fi)
 
-### Opcja B - Migracja do qr-code-styling
-- [x] Instalacja i konfiguracja qr-code-styling
-- [x] Utworzenie AdvancedQrGenerator z pełnym API
-- [x] Implementacja 6 typów zaokrąglonych kropek
-- [x] Obsługa gradientów (linear i radial)
-- [x] Stylizacja rogów (corner squares i dots)
-- [x] 5 predefiniowanych presetów gradientowych
-- [x] Tryb przełączania między prostym a zaawansowanym generatorem
+### Option B - Migration to qr-code-styling
+- [x] Installation and configuration of qr-code-styling
+- [x] AdvancedQrGenerator creation with full API
+- [x] Implementation of 6 rounded dot types
+- [x] Gradient support (linear and radial)
+- [x] Corner styling (corner squares and dots)
+- [x] 5 predefined gradient presets
+- [x] Toggle mode between simple and advanced generator
 
-### Opcja C - Pozostałe funkcje z TODO
-- [x] Drag & drop positioning dla logo z interaktywnymi handlami
-- [x] Tryb ciemny z automatyczną detekcją preferencji systemu
-- [x] Mobile responsiveness z optymalizacją layoutu
-- [x] System walidacji z inteligentnym sprawdzaniem danych
-- [x] Error handling z ErrorBoundary i notyfikacjami
-- [x] System notyfikacji z 4 typami (success, error, warning, info)
+### Option C - Remaining TODO features
+- [x] Drag & drop positioning for logo with interactive handles
+- [x] Dark mode with automatic system preference detection
+- [x] Mobile responsiveness with layout optimization
+- [x] Validation system with intelligent data checking
+- [x] Error handling with ErrorBoundary and notifications
+- [x] Notification system with 4 types (success, error, warning, info)
 
-## 🛠 Zadania systemowe
+## 🛠 System Tasks
 
-- [x] ~~Aktualizacja README po każdym etapie~~
-- [ ] Commit + push po każdej większej funkcji
-- [ ] Utrzymanie zgodności README ↔ kod
+- [x] ~~README update after each stage~~
+- [ ] Commit + push after each major feature
+- [ ] Maintain README ↔ code consistency
