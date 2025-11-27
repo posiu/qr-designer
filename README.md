@@ -183,9 +183,9 @@ qr-designer/
 ├── DEPLOYMENT.md # Deployment guide
 ├── TODO.md
 └── package.json
-```
 ├── vite.config.ts
 └── tsconfig.json
+```
 
 ---
 
