@@ -7,9 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "qr-code-styling": "^1.9.2",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

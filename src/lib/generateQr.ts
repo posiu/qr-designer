@@ -27,6 +27,26 @@ export async function generateQrDataUrl(
   });
 }
 
+/**
+ * Generates a QR code as SVG string.
+ */
+export async function generateQrSvg(
+  options: GenerateQrOptions
+): Promise<string> {
+  const { text, width, colorDark, colorLight, errorCorrectionLevel } = options;
+
+  return QRCode.toString(text, {
+    type: 'svg',
+    width,
+    color: {
+      dark: colorDark,
+      light: colorLight,
+    },
+    errorCorrectionLevel,
+    margin: 2,
+  });
+}
+
 // New helpers: generate module matrix and render rounded-dot SVG/PNG
 export type QrMatrix = {
   data: boolean[]; // row-major

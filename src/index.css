@@ -2,10 +2,133 @@
 
 :root {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #f1f5f9; /* slate-100 */
-  color: #0f172a;            /* slate-900 */
+  
+  /* Light theme variables */
+  --bg-primary: #f8fafc;     /* slate-50 */
+  --bg-secondary: #ffffff;   /* white */
+  --bg-tertiary: #f1f5f9;    /* slate-100 */
+  --text-primary: #0f172a;   /* slate-900 */
+  --text-secondary: #64748b; /* slate-500 */
+  --text-tertiary: #94a3b8;  /* slate-400 */
+  --border-primary: #e2e8f0; /* slate-200 */
+  --border-secondary: #cbd5e1; /* slate-300 */
+  
+  /* Button colors */
+  --btn-primary-bg: #3b82f6;     /* blue-500 */
+  --btn-primary-text: #ffffff;   /* white */
+  --btn-primary-hover: #2563eb;  /* blue-600 */
+  --btn-secondary-bg: #ffffff;   /* white */
+  --btn-secondary-text: #374151; /* gray-700 */
+  --btn-secondary-hover: #f9fafb; /* gray-50 */
+  --btn-secondary-border: #d1d5db; /* gray-300 */
 }
 
+/* Dark theme variables */
+.dark,
+[data-theme="dark"] {
+  --bg-primary: #0f172a;     /* slate-900 */
+  --bg-secondary: #1e293b;   /* slate-800 */
+  --bg-tertiary: #334155;    /* slate-700 */
+  --text-primary: #f8fafc;   /* slate-50 */
+  --text-secondary: #cbd5e1; /* slate-300 */
+  --text-tertiary: #94a3b8;  /* slate-400 */
+  --border-primary: #475569; /* slate-600 */
+  --border-secondary: #64748b; /* slate-500 */
+  
+  /* Button colors for dark theme */
+  --btn-primary-bg: #3b82f6;     /* blue-500 */
+  --btn-primary-text: #ffffff;   /* white */
+  --btn-primary-hover: #2563eb;  /* blue-600 */
+  --btn-secondary-bg: #374151;   /* gray-700 */
+  --btn-secondary-text: #d1d5db; /* gray-300 */
+  --btn-secondary-hover: #4b5563; /* gray-600 */
+  --btn-secondary-border: #6b7280; /* gray-500 */
+  
+  color-scheme: dark;
+}
+
+.light,
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Apply theme variables */
 body {
   margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Force input styling for all themes */
+input,
+textarea,
+select {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Ensure color inputs work properly */
+input[type="color"] {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-primary) !important;
+}
+
+/* File input styling */
+input[type="file"] {
+  color: var(--text-primary) !important;
+}
+
+input[type="file"]::file-selector-button {
+  background-color: var(--text-primary) !important;
+  color: var(--bg-primary) !important;
+  border: none !important;
+}
+
+/* Range input styling */
+input[type="range"] {
+  background-color: transparent !important;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  accent-color: var(--text-primary) !important;
+}
+
+/* Button styling */
+button {
+  background-color: var(--btn-secondary-bg) !important;
+  color: var(--btn-secondary-text) !important;
+  border-color: var(--btn-secondary-border) !important;
+  transition: all 0.2s ease !important;
+}
+
+button:hover {
+  background-color: var(--btn-secondary-hover) !important;
+}
+
+/* Primary button styling */
+button.btn-primary,
+button[data-primary="true"] {
+  background-color: var(--btn-primary-bg) !important;
+  color: var(--btn-primary-text) !important;
+  border-color: var(--btn-primary-bg) !important;
+}
+
+button.btn-primary:hover,
+button[data-primary="true"]:hover {
+  background-color: var(--btn-primary-hover) !important;
+  border-color: var(--btn-primary-hover) !important;
+}
+
+/* Label styling */
+label {
+  color: var(--text-primary) !important;
+}
+/* Force reload Thu Nov 27 18:24:18 CET 2025 */

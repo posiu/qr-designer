@@ -47,10 +47,14 @@ It is optimized for development inside **Cursor** with seamless Git/GitHub integ
 
 ### Styling
 - **Tailwind CSS v4**
+- **CSS Custom Properties** for theme management
+- **Dark/Light mode** with system preference detection
 - Custom canvas clipping for rounded corners
 
 ### QR Generation
-- **qrcode** (for PNG + SVG output)
+- **qrcode** (for basic PNG + SVG output)
+- **qr-code-styling** (for advanced features: rounded dots, gradients, corner styling)
+- **qr-code-styling** (for advanced styling with rounded dots, gradients)
 
 ### Browser APIs
 - Canvas API  
@@ -85,6 +89,11 @@ It is optimized for development inside **Cursor** with seamless Git/GitHub integ
   - bottom-right  
 - Automatic white rounded background behind the logo
 - Rounded QR **outer corners** (canvas clipping)
+- **Advanced Styling Mode:**
+  - **Rounded dots** (6 different styles: square, dots, rounded, extra-rounded, classy, classy-rounded)
+  - **Gradient support** (linear & radial gradients)
+  - **Corner customization** (squares and dots with independent colors)
+  - **Gradient presets** (Sunset, Ocean, Neon, Forest, Fire)
 - Preset themes:
   - Classic
   - Midnight
@@ -98,24 +107,34 @@ It is optimized for development inside **Cursor** with seamless Git/GitHub integ
 - Share via Web Share API (on supported devices)
 
 ### ✔ Local Gallery
-- Automatically saves last 50 generated QR codes
-- Thumbnail previews
-- Click to restore QR to preview panel
+- Save up to 50 generated QR codes in localStorage
+- Thumbnail previews with metadata
+- Click to restore settings and regenerate
+- Expandable/collapsible view
+- Individual item deletion and bulk clear
+
+### ✔ User Experience
+- **Dark/Light mode** with automatic system detection
+- **Responsive design** optimized for mobile and desktop
+- **Toast notifications** for user feedback (success, error, warning, info)
+- **Error boundaries** with graceful error handling
+- **Interactive drag & drop** for logo positioning
+- **Visual feedback** for all button states and interactions
+- **Consistent theming** with CSS custom properties
 
 ---
 
 ## 🎯 Roadmap (Planned Features)
 
-- Real **rounded QR dots**  
-  (via migration to `qr-code-styling`)
-- Gradient themes
-- Drag-and-drop logo repositioning
-- Saving/exporting QR style as JSON
-- Importing style presets
-- QR scannability/validation checks
-- Dark mode UI
-- Mobile-optimized layout
-- Dedicated SettingsPanel and GalleryPanel components
+- ✅ **COMPLETED**: Real **rounded QR dots** (via qr-code-styling)
+- ✅ **COMPLETED**: Gradient themes
+- ✅ **COMPLETED**: Drag-and-drop logo repositioning
+- ✅ **COMPLETED**: Saving/exporting QR style as JSON
+- ✅ **COMPLETED**: Importing style presets
+- ✅ **COMPLETED**: QR scannability/validation checks
+- ✅ **COMPLETED**: Dark mode UI
+- ✅ **COMPLETED**: Mobile-optimized layout
+- ✅ **COMPLETED**: Dedicated SettingsPanel and GalleryPanel components
 - Brand kits (custom colors, logos)
 - Animated QR (GIF/WebM)
 - Integration with a link shortener API
@@ -128,11 +147,25 @@ It is optimized for development inside **Cursor** with seamless Git/GitHub integ
 qr-designer/
 ├── src/
 │ ├── components/
-│ │ └── QrCanvas.tsx # Renders QR to canvas with rounded corners + logo overlay
+│ │ ├── QrCanvas.tsx # Renders QR to canvas with rounded corners + logo overlay
+│ │ ├── DragDropCanvas.tsx # Interactive drag & drop logo positioning
+│ │ ├── SettingsPanel.tsx # QR configuration form with data types & advanced styling
+│ │ ├── PreviewPanel.tsx # QR preview display
+│ │ ├── ExportPanel.tsx # PNG/SVG export and embed code
+│ │ ├── GalleryPanel.tsx # Local gallery with localStorage
+│ │ ├── ThemeToggle.tsx # Dark/light mode switcher
+│ │ ├── NotificationContainer.tsx # Toast notifications system
+│ │ └── ErrorBoundary.tsx # Error handling wrapper
+│ ├── contexts/
+│ │ ├── ThemeContext.tsx # Theme management with system detection
+│ │ └── NotificationContext.tsx # Global notification state
 │ ├── lib/
-│ │ └── generateQr.ts # PNG + SVG generation helpers
-│ ├── App.tsx # Main UI, forms, export, gallery, presets
-│ ├── index.css # Tailwind v4 setup
+│ │ ├── generateQr.ts # Basic PNG + SVG generation helpers
+│ │ └── advancedQrGenerator.ts # Advanced QR generation with qr-code-styling
+│ ├── types/
+│ │ └── qr-code-styling.d.ts # TypeScript definitions for qr-code-styling
+│ ├── App.tsx # Main application layout and state management
+│ ├── index.css # Tailwind v4 + CSS custom properties for theming
 │ ├── main.tsx # React app bootstrap
 │
 ├── public/

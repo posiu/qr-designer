@@ -1,36 +1,153 @@
-import React, { useState, useCallback } from "react";
-import { generateQrDataUrl } from "./lib/generateQr";
-import { QrCanvas } from "./components/QrCanvas";
-
-type ErrorCorrection = "L" | "M" | "Q" | "H";
-type SymbolPosition = "none" | "center" | "tl" | "tr" | "bl" | "br";
+import React, { useState, useCallback, useEffect } from "react";
+import { generateQrDataUrl, generateQrSvg } from "./lib/generateQr";
+import { AdvancedQrGenerator, type AdvancedQrOptions } from "./lib/advancedQrGenerator";
+import { SettingsPanel, type QrSettings, type Theme } from "./components/SettingsPanel";
+import { PreviewPanel } from "./components/PreviewPanel";
+import { ExportPanel } from "./components/ExportPanel";
+import { GalleryPanel } from "./components/GalleryPanel";
+import { ThemeToggle } from "./components/ThemeToggle";
+import { NotificationContainer } from "./components/NotificationContainer";
+import { useNotifications } from "./contexts/NotificationContext";
 
 function App() {
-  const [url, setUrl] = useState("");
-  const [fg, setFg] = useState("#0f172a"); // slate-900
-  const [bg, setBg] = useState("#ffffff");
-  const [size, setSize] = useState(512);
-  const [ecLevel, setEcLevel] = useState<ErrorCorrection>("H");
-  const [symbolPos, setSymbolPos] = useState<SymbolPosition>("center");
-  const [symbolDataUrl, setSymbolDataUrl] = useState<string | undefined>();
+  const { success, error } = useNotifications();
+  
+  // Debug: Log initial state
+  useEffect(() => {
+    console.log('=== APP COMPONENT MOUNTED ===');
+    console.log('Initial document classes:', document.documentElement.className);
+    console.log('Initial data-theme:', document.documentElement.getAttribute('data-theme'));
+    console.log('System prefers dark:', window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }, []);
+  const [settings, setSettings] = useState<QrSettings>({
+    dataType: "url",
+    url: "",
+    text: "",
+    wifiSsid: "",
+    wifiPassword: "",
+    wifiSecurity: "WPA",
+    wifiHidden: false,
+    fg: "#0f172a", // slate-900
+    bg: "#ffffff",
+    size: 512,
+    ecLevel: "H",
+    symbolPos: "center",
+    symbolDataUrl: undefined,
+    
+    // Advanced styling defaults
+    useAdvancedStyling: false,
+    dotType: "square",
+    useGradient: false,
+    gradientType: "linear",
+    gradientRotation: 0,
+    gradientStartColor: "#0f172a",
+    gradientEndColor: "#64748b",
+    cornerSquareType: "square",
+    cornerDotType: "square",
+    cornerSquareColor: "#0f172a",
+    cornerDotColor: "#0f172a",
+    
+    // Logo positioning
+    logoPosition: { x: 0.5, y: 0.5, size: 0.2 },
+    isDragMode: false,
+  });
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const normalizeUrl = (inputUrl: string): string => {
+    const trimmed = inputUrl.trim();
+    if (!trimmed) return trimmed;
+    
+    // If it already has a protocol, return as is
+    if (trimmed.match(/^https?:\/\//i)) {
+      return trimmed;
+    }
+    
+    // Add https:// if it looks like a domain
+    if (trimmed.includes('.') && !trimmed.includes(' ')) {
+      return `https://${trimmed}`;
+    }
+    
+    return trimmed;
+  };
+
+  const getQrText = (): string => {
+    switch (settings.dataType) {
+      case "url":
+        return normalizeUrl(settings.url);
+      case "text":
+        return settings.text;
+      case "wifi":
+        // WiFi QR format: WIFI:T:WPA;S:mynetwork;P:mypass;H:false;;
+        const security = settings.wifiSecurity === "nopass" ? "" : settings.wifiSecurity;
+        const password = settings.wifiSecurity === "nopass" ? "" : settings.wifiPassword;
+        const hidden = settings.wifiHidden ? "true" : "false";
+        return `WIFI:T:${security};S:${settings.wifiSsid};P:${password};H:${hidden};;`;
+      default:
+        return "";
+    }
+  };
+
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!url) return;
+    const qrText = getQrText();
+    if (!qrText) return;
 
     try {
       setIsGenerating(true);
+      
+      if (settings.useAdvancedStyling) {
+        // Use advanced generator
+        const advancedOptions: AdvancedQrOptions = {
+          text: qrText,
+          width: settings.size,
+          errorCorrectionLevel: settings.ecLevel,
+          dotsType: settings.dotType,
+          
+          // Handle gradient or solid color for dots
+          ...(settings.useGradient ? {
+            dotsGradient: {
+              type: settings.gradientType,
+              rotation: settings.gradientRotation,
+              colorStops: [
+                { offset: 0, color: settings.gradientStartColor },
+                { offset: 1, color: settings.gradientEndColor }
+              ]
+            }
+          } : {
+            dotsColor: settings.fg
+          }),
+          
+          backgroundColor: settings.bg,
+          cornerSquareColor: settings.cornerSquareColor,
+          cornerSquareType: settings.cornerSquareType,
+          cornerDotColor: settings.cornerDotColor,
+          cornerDotType: settings.cornerDotType,
+          
+          // Logo options
+          ...(settings.symbolDataUrl ? {
+            image: settings.symbolDataUrl,
+            imageSize: 0.3,
+            imageMargin: 5,
+            hideBackgroundDots: true,
+          } : {})
+        };
+        
+        const generator = new AdvancedQrGenerator(advancedOptions);
+        const dataUrl = await generator.getPngDataUrl();
+        setQrDataUrl(dataUrl);
+      } else {
+        // Use simple generator
       const dataUrl = await generateQrDataUrl({
-        text: url,
-        width: size,
-        colorDark: fg,
-        colorLight: bg,
-        errorCorrectionLevel: ecLevel,
+          text: qrText,
+          width: settings.size,
+          colorDark: settings.fg,
+          colorLight: settings.bg,
+          errorCorrectionLevel: settings.ecLevel,
       });
       setQrDataUrl(dataUrl);
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -43,7 +160,7 @@ function App() {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        setSymbolDataUrl(reader.result);
+        setSettings(prev => ({ ...prev, symbolDataUrl: reader.result as string }));
       }
     };
     reader.readAsDataURL(file);
@@ -57,23 +174,111 @@ function App() {
     link.click();
   }, [canvasRef]);
 
-  const embedCode = canvasRef
-    ? `<img src="${canvasRef.toDataURL(
-        "image/png"
-      )}" alt="QR code" width="${size}" height="${size}" />`
-    : "";
+  const handleDownloadSvg = useCallback(async () => {
+    const qrText = getQrText();
+    if (!qrText) return;
+
+    try {
+      if (settings.useAdvancedStyling) {
+        // Use advanced generator for SVG
+        const advancedOptions: AdvancedQrOptions = {
+          text: qrText,
+          width: settings.size,
+          errorCorrectionLevel: settings.ecLevel,
+          dotsType: settings.dotType,
+          
+          ...(settings.useGradient ? {
+            dotsGradient: {
+              type: settings.gradientType,
+              rotation: settings.gradientRotation,
+              colorStops: [
+                { offset: 0, color: settings.gradientStartColor },
+                { offset: 1, color: settings.gradientEndColor }
+              ]
+            }
+          } : {
+            dotsColor: settings.fg
+          }),
+          
+          backgroundColor: settings.bg,
+          cornerSquareColor: settings.cornerSquareColor,
+          cornerSquareType: settings.cornerSquareType,
+          cornerDotColor: settings.cornerDotColor,
+          cornerDotType: settings.cornerDotType,
+          
+          ...(settings.symbolDataUrl ? {
+            image: settings.symbolDataUrl,
+            imageSize: 0.3,
+            imageMargin: 5,
+            hideBackgroundDots: true,
+          } : {})
+        };
+        
+        const generator = new AdvancedQrGenerator(advancedOptions);
+        await generator.downloadSvg();
+      } else {
+        // Use simple generator for SVG
+        const svgString = await generateQrSvg({
+          text: qrText,
+          width: settings.size,
+          colorDark: settings.fg,
+          colorLight: settings.bg,
+          errorCorrectionLevel: settings.ecLevel,
+        });
+        
+        const blob = new Blob([svgString], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.download = "qr-code.svg";
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error("Failed to generate SVG:", err);
+      error("SVG Export Failed", "Could not generate SVG file. Please try again.");
+    }
+  }, [settings, getQrText]);
+
+  const handleShare = useCallback(async () => {
+    if (!canvasRef) return;
+
+    try {
+      // Convert canvas to blob
+      canvasRef.toBlob(async (blob) => {
+        if (!blob) return;
+        
+        const file = new File([blob], "qr-code.png", { type: "image/png" });
+        
+        if (navigator.share) {
+          await navigator.share({
+            title: "QR Code",
+            text: "Check out this QR code!",
+            files: [file],
+          });
+        }
+      }, "image/png");
+    } catch (err) {
+      console.error("Failed to share:", err);
+      error("Share Failed", "Could not share QR code. Please try downloading instead.");
+    }
+  }, [canvasRef]);
 
   const handleCopyEmbed = async () => {
-    if (!embedCode) return;
+    if (!canvasRef) return;
+    const embedCode = `<img src="${canvasRef.toDataURL(
+      "image/png"
+    )}" alt="QR code" width="${settings.size}" height="${settings.size}" />`;
+    
     try {
       await navigator.clipboard.writeText(embedCode);
-      alert("Embed code copied to clipboard!");
+      success("Copied to clipboard!", "Embed code has been copied successfully.");
     } catch {
-      alert("Could not copy embed code (clipboard permission issue).");
+      error("Copy failed", "Could not copy embed code. Please check clipboard permissions.");
     }
   };
 
-  const themes = [
+  const themes: Theme[] = [
   {
     id: "classic",
     label: "Classic",
@@ -101,227 +306,78 @@ function App() {
 ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center p-6">
+    <div 
+      className="min-h-screen flex flex-col items-center p-6 transition-colors"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+    >
       <div className="w-full max-w-5xl">
-        <header className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            QR Designer
+        <header className="mb-6 md:mb-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3 md:gap-4">
+              <h1 
+                className="text-2xl md:text-3xl font-bold tracking-tight"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                QR Designer
           </h1>
-          <p className="text-slate-500 text-sm">
+              <ThemeToggle />
+            </div>
+            <p 
+            className="text-sm md:text-base"
+            style={{ color: 'var(--text-secondary)' }}
+          >
             Create colorful QR codes with a logo and export as PNG or embed code.
           </p>
+          </div>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] items-start">
-          {/* Left: Form */}
-          <form
-            onSubmit={handleGenerate}
-            className="bg-white shadow-sm rounded-2xl border border-slate-200 p-5 space-y-5"
-          >
-            <div>
-              <label className="block text-sm font-medium text-slate-700">
-                Target URL
-              </label>
-              <input
-                className="mt-1 w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
-                type="url"
-                required
-                placeholder="https://example.com"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-              <p className="mt-1 text-xs text-slate-400">
-                Make sure it&apos;s a valid URL. The QR will encode this value.
-              </p>
-            </div>
-
-            <div>
-              <span className="block text-sm font-medium text-slate-700 mb-1">
-                Presets
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {themes.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => {
-                      setFg(t.fg);
-                      setBg(t.bg);
-                    }}
-                    className="px-2.5 py-1 rounded-full border border-slate-200 text-xs bg-slate-50 hover:bg-slate-100 text-slate-700"
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Foreground color
-                </label>
-                <input
-                  type="color"
-                  className="mt-1 w-full h-10 border border-slate-200 rounded-lg cursor-pointer bg-white"
-                  value={fg}
-                  onChange={(e) => setFg(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Background color
-                </label>
-                <input
-                  type="color"
-                  className="mt-1 w-full h-10 border border-slate-200 rounded-lg cursor-pointer bg-white"
-                  value={bg}
-                  onChange={(e) => setBg(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Size ({size}px)
-                </label>
-                <input
-                  type="range"
-                  min={256}
-                  max={1024}
-                  step={64}
-                  value={size}
-                  onChange={(e) => setSize(Number(e.target.value))}
-                  className="mt-1 w-full"
-                />
-                <p className="mt-1 text-xs text-slate-400">
-                  Larger sizes look sharper when printed.
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Error correction
-                </label>
-                <select
-                  className="mt-1 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-                  value={ecLevel}
-                  onChange={(e) =>
-                    setEcLevel(e.target.value as ErrorCorrection)
-                  }
-                >
-                  <option value="L">L — lowest (more data capacity)</option>
-                  <option value="M">M — medium</option>
-                  <option value="Q">Q — high</option>
-                  <option value="H">
-                    H — highest (best for QR with logos)
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 items-end">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Symbol / logo image
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleSymbolUpload}
-                  className="mt-1 block w-full text-sm text-slate-600
-                             file:mr-2 file:py-1.5 file:px-3
-                             file:rounded-md file:border-0
-                             file:text-sm file:font-medium
-                             file:bg-slate-900 file:text-white
-                             hover:file:bg-slate-800"
-                />
-                <p className="mt-1 text-xs text-slate-400">
-                  PNG/SVG/JPG. Transparent logos work best.
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Symbol position
-                </label>
-                <select
-                  className="mt-1 w-full border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
-                  value={symbolPos}
-                  onChange={(e) =>
-                    setSymbolPos(e.target.value as SymbolPosition)
-                  }
-                >
-                  <option value="none">None</option>
-                  <option value="center">Center</option>
-                  <option value="tl">Top-left</option>
-                  <option value="tr">Top-right</option>
-                  <option value="bl">Bottom-left</option>
-                  <option value="br">Bottom-right</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isGenerating}
-              className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white py-2.5 text-sm font-medium shadow-sm hover:bg-slate-800 disabled:opacity-60 disabled:cursor-wait"
-            >
-              {isGenerating ? "Generating..." : "Generate QR code"}
-            </button>
-          </form>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start">
+          {/* Left: Settings */}
+          <SettingsPanel
+            settings={settings}
+            onSettingsChange={(newSettings) => 
+              setSettings(prev => ({ ...prev, ...newSettings }))
+            }
+            onSymbolUpload={handleSymbolUpload}
+            onGenerate={handleGenerate}
+            isGenerating={isGenerating}
+            themes={themes}
+          />
 
           {/* Right: Preview & export */}
           <div className="space-y-4">
-            <div className="bg-white shadow-sm rounded-2xl border border-slate-200 p-4 flex flex-col items-center justify-center min-h-[320px]">
-              {qrDataUrl ? (
-                <QrCanvas
+            <PreviewPanel
                   qrDataUrl={qrDataUrl}
-                  size={size}
-                  symbolDataUrl={symbolDataUrl}
-                  symbolPosition={symbolPos}
+              size={settings.size}
+              symbolDataUrl={settings.symbolDataUrl}
+              symbolPosition={settings.symbolPos}
+              logoPosition={settings.logoPosition}
+              isDragMode={settings.isDragMode}
                   onCanvasReady={setCanvasRef}
-                />
-              ) : (
-                <p className="text-sm text-slate-400 text-center">
-                  Fill in the form and click &quot;Generate QR code&quot; to
-                  see the preview here.
-                </p>
-              )}
-            </div>
+              onLogoPositionChange={(position) => 
+                setSettings(prev => ({ ...prev, logoPosition: position }))
+              }
+            />
 
-            <div className="bg-white shadow-sm rounded-2xl border border-slate-200 p-4 space-y-3">
-              <h2 className="text-sm font-semibold text-slate-800">
-                Export
-              </h2>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={handleDownloadPng}
-                  disabled={!canvasRef}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Download PNG
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopyEmbed}
-                  disabled={!canvasRef}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Copy embed code
-                </button>
-              </div>
-              <textarea
-                className="mt-2 w-full border border-slate-200 rounded-lg p-2 text-xs font-mono text-slate-700 resize-none"
-                rows={4}
-                readOnly
-                value={embedCode}
-                placeholder="<img src='...' alt='QR code' />"
-              />
-            </div>
+            <ExportPanel
+              canvasRef={canvasRef}
+              size={settings.size}
+              onDownloadPng={handleDownloadPng}
+              onDownloadSvg={handleDownloadSvg}
+              onCopyEmbed={handleCopyEmbed}
+              onShare={handleShare}
+            />
+
+            <GalleryPanel
+              onRestoreSettings={(newSettings) => setSettings(newSettings)}
+              currentSettings={qrDataUrl ? settings : undefined}
+              currentThumbnail={canvasRef?.toDataURL("image/png")}
+              currentQrText={qrDataUrl ? getQrText() : undefined}
+            />
           </div>
         </div>
       </div>
+      <NotificationContainer />
     </div>
   );
 }
