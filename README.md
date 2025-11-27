@@ -6,6 +6,12 @@ It supports multiple QR data types, custom colors, themes, rounded corners, opti
 The entire project runs fully client-side (no backend).  
 It is optimized for development inside **Cursor** with seamless Git/GitHub integration.
 
+## 🌐 Live Demo
+
+**Try it now:** [https://qr-designer-gamma.vercel.app/](https://qr-designer-gamma.vercel.app/)
+
+The application is deployed and available 24/7. No installation required - just open the link and start creating beautiful QR codes!
+
 ---
 
 ## 🚀 Project Goals
@@ -144,6 +150,7 @@ It is optimized for development inside **Cursor** with seamless Git/GitHub integ
 
 ## 🏗 Project Architecture
 
+```
 qr-designer/
 ├── src/
 │ ├── components/
@@ -153,6 +160,7 @@ qr-designer/
 │ │ ├── PreviewPanel.tsx # QR preview display
 │ │ ├── ExportPanel.tsx # PNG/SVG export and embed code
 │ │ ├── GalleryPanel.tsx # Local gallery with localStorage
+│ │ ├── QrModal.tsx # Modal for full-size QR preview and editing
 │ │ ├── ThemeToggle.tsx # Dark/light mode switcher
 │ │ ├── NotificationContainer.tsx # Toast notifications system
 │ │ └── ErrorBoundary.tsx # Error handling wrapper
@@ -166,13 +174,16 @@ qr-designer/
 │ │ └── qr-code-styling.d.ts # TypeScript definitions for qr-code-styling
 │ ├── App.tsx # Main application layout and state management
 │ ├── index.css # Tailwind v4 + CSS custom properties for theming
-│ ├── main.tsx # React app bootstrap
+│ └── main.tsx # React app bootstrap
 │
 ├── public/
+├── dist/ # Build output
 │
 ├── README.md
+├── DEPLOYMENT.md # Deployment guide
 ├── TODO.md
-├── package.json
+└── package.json
+```
 ├── vite.config.ts
 └── tsconfig.json
 
@@ -202,14 +213,21 @@ dist/
 ---
 
 ## 🌐 Deployment (Recommended: Vercel)
+
+**Live Demo:** [https://qr-designer-gamma.vercel.app/](https://qr-designer-gamma.vercel.app/)
+
+The application is currently deployed on Vercel. To deploy your own instance:
+
 - Connect your GitHub account to Vercel
 - Import repository: posiu/qr-designer
 - Configure:
-  - Build command: npm run build
-  - Output directory: dist
+  - Build command: `npm run build`
+  - Output directory: `dist`
 - Deploy
 
 Every git push to the main branch triggers an automatic redeploy.
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ---
 
