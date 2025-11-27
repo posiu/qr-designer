@@ -1,39 +1,67 @@
 import React, { useEffect, useRef } from "react";
+import {
+  generateRoundedDataUrl,
+} from "../lib/generateQr";
 
 type SymbolPosition = "none" | "center" | "tl" | "tr" | "bl" | "br";
 
 type Props = {
   qrDataUrl: string | null;
+  // optional: raw text to render with rounded dots (alternative to qrDataUrl)
+  qrText?: string;
   size: number;
   symbolDataUrl?: string;
   symbolPosition: SymbolPosition;
+  roundedDots?: boolean;
   onCanvasReady?: (canvas: HTMLCanvasElement | null) => void;
 };
 
 export const QrCanvas: React.FC<Props> = ({
   qrDataUrl,
+  qrText,
   size,
   symbolDataUrl,
   symbolPosition,
+  roundedDots,
   onCanvasReady,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !qrDataUrl) return;
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const qrImg = new Image();
-    qrImg.src = qrDataUrl;
+    const drawFromDataUrl = (dataUrl: string | null) => {
+      if (!dataUrl) return;
+      const qrImg = new Image();
+      qrImg.src = dataUrl;
 
-    qrImg.onload = () => {
+      qrImg.onload = () => {
       canvas.width = size;
       canvas.height = size;
       ctx.clearRect(0, 0, size, size);
-      ctx.drawImage(qrImg, 0, 0, size, size);
+      
+      // ⬇️ NEW: clip to rounded outer border
+      const outerRadius = size * 0.12; // adjust if you want more/less rounding
+      ctx.save();
+      ctx.beginPath();
+      const r = outerRadius;
+      ctx.moveTo(r, 0);
+      ctx.lineTo(size - r, 0);
+      ctx.quadraticCurveTo(size, 0, size, r);
+      ctx.lineTo(size, size - r);
+      ctx.quadraticCurveTo(size, size, size - r, size);
+      ctx.lineTo(r, size);
+      ctx.quadraticCurveTo(0, size, 0, size - r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+      ctx.clip();
+
+        ctx.drawImage(qrImg, 0, 0, size, size);
 
       if (symbolDataUrl && symbolPosition !== "none") {
         const logoImg = new Image();
@@ -65,7 +93,6 @@ export const QrCanvas: React.FC<Props> = ({
               x = size - logoSize - size * 0.05;
               y = size - logoSize - size * 0.05;
               break;
-            case "none":
             default:
               return;
           }
@@ -98,13 +125,25 @@ export const QrCanvas: React.FC<Props> = ({
           ctx.fill();
 
           ctx.drawImage(logoImg, x, y, logoSize, logoSize);
-          ctx.restore();
+          ctx.restore(); // restore from the outer clip
         };
+      }
+      };
+  };
+
+    const render = async () => {
+      if (roundedDots && qrText) {
+        // generate rounded-dot PNG data url and draw that instead of existing svg/png
+        const dataUrl = await generateRoundedDataUrl(qrText, size);
+        drawFromDataUrl(dataUrl);
+      } else if (qrDataUrl) {
+        drawFromDataUrl(qrDataUrl);
       }
     };
 
+    render();
     onCanvasReady?.(canvas);
-  }, [qrDataUrl, size, symbolDataUrl, symbolPosition, onCanvasReady]);
+  }, [qrDataUrl, size, symbolDataUrl, symbolPosition, roundedDots, qrText, onCanvasReady]);
 
   return (
     <canvas

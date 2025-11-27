@@ -73,6 +73,33 @@ function App() {
     }
   };
 
+  const themes = [
+  {
+    id: "classic",
+    label: "Classic",
+    fg: "#0f172a",
+    bg: "#ffffff",
+  },
+  {
+    id: "midnight",
+    label: "Midnight",
+    fg: "#e5e7eb",
+    bg: "#020617",
+  },
+  {
+    id: "sunset",
+    label: "Sunset",
+    fg: "#be123c",
+    bg: "#fef3c7",
+  },
+  {
+    id: "aqua",
+    label: "Aqua",
+    fg: "#0e7490",
+    bg: "#ecfeff",
+  },
+];
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center p-6">
       <div className="w-full max-w-5xl">
@@ -106,6 +133,27 @@ function App() {
               <p className="mt-1 text-xs text-slate-400">
                 Make sure it&apos;s a valid URL. The QR will encode this value.
               </p>
+            </div>
+
+            <div>
+              <span className="block text-sm font-medium text-slate-700 mb-1">
+                Presets
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {themes.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      setFg(t.fg);
+                      setBg(t.bg);
+                    }}
+                    className="px-2.5 py-1 rounded-full border border-slate-200 text-xs bg-slate-50 hover:bg-slate-100 text-slate-700"
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
